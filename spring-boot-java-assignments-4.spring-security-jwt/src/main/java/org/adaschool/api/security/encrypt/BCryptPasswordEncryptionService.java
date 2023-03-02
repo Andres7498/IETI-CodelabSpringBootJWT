@@ -14,11 +14,13 @@ public class BCryptPasswordEncryptionService implements PasswordEncryptionServic
 
     @Override
     public String encrypt(String password) {
-        return "";
+        return passwordEncoder.encode(password);
     }
 
     @Override
     public boolean isPasswordMatch(String password, String encryptedPassword) {
-        return true;
+        return passwordEncoder.matches(password,encryptedPassword);
     }
+
+
 }
