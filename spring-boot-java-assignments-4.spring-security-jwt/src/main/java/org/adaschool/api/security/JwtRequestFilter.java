@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.adaschool.api.utils.Constants.CLAIMS_ROLES_KEY;
-import static org.adaschool.api.utils.Constants.COOKIE_NAME;
+import static org.adaschool.api.utils.Constants.*;
+
 @Component
 public class JwtRequestFilter
         extends OncePerRequestFilter {
@@ -45,6 +45,7 @@ public class JwtRequestFilter
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
         String authHeader = request.getHeader( HttpHeaders.AUTHORIZATION );
 
         if ( HttpMethod.OPTIONS.name().equals( request.getMethod() ) )
@@ -75,7 +76,7 @@ public class JwtRequestFilter
                     List<String> roles  = claims.getBody().get( CLAIMS_ROLES_KEY , ArrayList.class);
 
                     if (roles == null) {
-                        response.sendError(HttpStatus.UNAUTHORIZED.value(), "Invalid token roles");
+                        response.sendError(HttpStatus.UNAUTHORIZED.value(), MISSING_TOKEN_ERROR_MESSAGE);
                     } else {
                         SecurityContextHolder.getContext().setAuthentication( new TokenAuthentication( token, subject, roles));
                     }
@@ -89,15 +90,13 @@ public class JwtRequestFilter
             }
             catch ( MalformedJwtException e )
             {
-                response.sendError( HttpStatus.BAD_REQUEST.value(), "Missing or wrong token" );
+                response.sendError( HttpStatus.BAD_REQUEST.value(), MISSING_TOKEN_ERROR_MESSAGE);
             }
             catch ( ExpiredJwtException e )
             {
-                response.sendError( HttpStatus.UNAUTHORIZED.value(), "Token expired or malformed" );
+                response.sendError( HttpStatus.UNAUTHORIZED.value(), TOKEN_EXPIRED_MALFORMED_ERROR_MESSAGE);
             }
         }
-
     }
-
 }
 
